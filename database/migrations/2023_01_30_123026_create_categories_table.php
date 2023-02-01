@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      *
@@ -15,8 +14,13 @@ return new class extends Migration
     {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('slug');
+
+            $table->string('slug')
+                ->nullable()
+                ->unique();
+
             $table->string('title');
+
             $table->timestamps();
         });
     }
@@ -28,7 +32,7 @@ return new class extends Migration
      */
     public function down()
     {
-        if(app()->isLocal()) {
+        if (app()->isLocal()) {
             Schema::dropIfExists('categories');
         }
     }
