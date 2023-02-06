@@ -3,16 +3,23 @@
 namespace App\Faker;
 
 use Faker\Provider\Base;
-use Faker\Provider\File;
+use Illuminate\Support\Facades\Storage;
 
 class FakerImageProvider extends Base
 {
-    public function productImage(string $sourceDir, string $targetDir): string
+    public function fixturesImage(string $fixturesDir, string $storageDir): string
     {
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir);
+        if (!Storage::exists($storageDir)) {
+            Storage::makeDirectory($storageDir);
         }
-        return 'storage/images/products/' . File::file($sourceDir, $targetDir, false);
+
+        $filename = $this->generator->file(
+            base_path('tests/Fixtures/images/' . $fixturesDir),
+            Storage::path($storageDir),
+            false
+        );
+
+        return '/storage/' . trim($storageDir, '/') . '/' . $filename;
     }
 
 }
