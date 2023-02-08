@@ -3,14 +3,14 @@
     <h1 class="mb-5 text-lg font-semibold">
         {{ $title }}
     </h1>
-
+    
     <form class="space-y-3" action="{{ $action }}" method="{{ $method }}">
         {{ $slot }}
     </form>
 
-    {{ $socialAuth }}
+    {{ $socialAuth ?? '' }}
 
-    {{ $buttons }}
+    {{ $buttons ?? '' }}
 
     <ul class="flex flex-col md:flex-row justify-between gap-3 md:gap-4 mt-14 md:mt-20">
         <li>
