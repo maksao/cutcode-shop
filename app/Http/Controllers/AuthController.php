@@ -18,17 +18,19 @@ use Laravel\Socialite\Facades\Socialite;
 
 class AuthController extends Controller
 {
-    public function index()
+    public function index(): Application|Factory|View|RedirectResponse
     {
+        //flash()->info('Test');
+        //return redirect()->route('home');
         return view('auth.index');
     }
 
-    public function signUp()
+    public function signUp(): Application|Factory|View
     {
         return view('auth.sign-up');
     }
 
-    public function forgot()
+    public function forgot(): Application|Factory|View
     {
         return view('auth.forgot-password');
     }
@@ -81,9 +83,11 @@ class AuthController extends Controller
             $request->only('email')
         );
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['message' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+        if ($status === Password::RESET_LINK_SENT) {
+            flash()->info(__($status));
+            return back();
+        }
+        return back()->withErrors(['email' => __($status)]);
     }
 
     public function reset(string $token): Application|Factory|View
@@ -106,9 +110,11 @@ class AuthController extends Controller
             }
         );
 
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('message', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
+        if ($status === Password::PASSWORD_RESET) {
+            flash()->info(__($status));
+            return redirect()->route('login');
+        }
+        return back()->withErrors(['email' => __($status)]);
     }
 
     public function github(): RedirectResponse
