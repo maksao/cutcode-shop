@@ -1,29 +1,14 @@
 @extends('layouts.auth')
 
-@section('title', 'Регистрация')
+@section('title', 'Вход в аккаунт')
 
 @section('content')
-
     <x-forms.auth-forms
-            title="Регистрация"
-            action="{{ route('register.handle') }}"
+            title="Вход в аккаунт"
+            action="{{ route('login.handle') }}"
             method="POST"
     >
         @csrf
-
-        <x-forms.text-input
-                name="name"
-                placeholder="Имя"
-                required
-                value="{{ old('name') }}"
-                :is-error="$errors->has('name')"
-        />
-
-        @error('name')
-        <x-forms.error>
-            {{ $message }}
-        </x-forms.error>
-        @enderror
 
         <x-forms.text-input
                 name="email"
@@ -48,28 +33,8 @@
                 :is-error="$errors->has('password')"
         />
 
-        @error('password')
-        <x-forms.error>
-            {{ $message }}
-        </x-forms.error>
-        @enderror
-
-        <x-forms.text-input
-                name="password_confirmation"
-                type="password"
-                placeholder="Повторите пароль"
-                required
-                :is-error="$errors->has('password')"
-        />
-
-        @error('password_confirmation')
-        <x-forms.error>
-            {{ $message }}
-        </x-forms.error>
-        @enderror
-
         <x-forms.primary-button type="submit">
-            Зарегистрироваться
+            Войти
         </x-forms.primary-button>
 
         <x-slot:socialAuth>
@@ -92,10 +57,14 @@
 
         <x-slot:buttons>
             <div class="space-y-3 mt-5">
-                <div class="text-xxs md:text-xs"><a href="{{ route('login') }}"
-                                                    class="text-white hover:text-white/70 font-bold">Войти
-                        в аккаунт</a></div>
+                <div class="text-xxs md:text-xs"><a href="{{ route('forgot') }}"
+                                                    class="text-white hover:text-white/70 font-bold">Забыли
+                        пароль?</a></div>
+                <div class="text-xxs md:text-xs"><a href="{{ route('register') }}"
+                                                    class="text-white hover:text-white/70 font-bold">Регистрация</a>
+                </div>
             </div>
         </x-slot:buttons>
+
     </x-forms.auth-forms>
 @endsection
