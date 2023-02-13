@@ -22,7 +22,7 @@ class AuthRegistrar implements RouteRegistrar
                 Route::post('/login', 'handle')
                     ->middleware('throttle:auth')
                     ->name('login.handle');
-                Route::delete('/logout', 'logOut')->name('logOut');
+                Route::delete('/logout', 'logOut')->name('logout');
             });
 
             Route::controller(SignUpController::class)->group(function () {

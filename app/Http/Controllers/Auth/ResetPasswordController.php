@@ -37,6 +37,7 @@ class ResetPasswordController extends Controller
             flash()->info(__($status));
             return redirect()->route('login');
         }
+
         return back()->withErrors(['email' => __($status)]);
     }
 
