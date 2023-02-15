@@ -29,10 +29,10 @@ class SocialAuthController extends Controller
         $driverUser = Socialite::driver($driver)->user();
 
         $user = User::query()->firstOrCreate([
-            $driver . '_id' => $driverUser->id,
+            $driver . '_id' => $driverUser->getId(),
         ], [
-            'name' => $driverUser->name ?? 'NoName',
-            'email' => $driverUser->email,
+            'name' => $driverUser->getName() ?? 'NoName',
+            'email' => $driverUser->getEmail(),
             'password' => bcrypt(str()->random(20))
         ]);
 

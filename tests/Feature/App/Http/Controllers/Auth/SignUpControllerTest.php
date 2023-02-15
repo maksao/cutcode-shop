@@ -5,16 +5,46 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Requests\SignUpFormRequest;
 use App\Listeners\SendEmailNewUserListener;
 use App\Notifications\NewUserNotification;
+use Database\Factories\UserFactory;
 use Domain\Auth\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 class SignUpControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected array $request;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->request = SignUpFormRequest::factory()->create([
+            'email' => 'info@ya.ru',
+            'password' => '1234567890',
+            'password_confirmation' => '1234567890'
+        ]);
+    }
+
+    private function request(): TestResponse
+    {
+        return $this->post(
+            action([SignUpController::class, 'handle']),
+            $this->request
+        );
+    }
+
+    private function findUser(): User
+    {
+        return User::query()
+            ->where('email', $this->request['email'])
+            ->first();
+    }
 
     /** @test */
     public function it_sign_up_page_success(): void
@@ -26,56 +56,86 @@ class SignUpControllerTest extends TestCase
     }
 
     /** @test */
-    public function it_sign_up_success(): void
+    public function it_validation_success(): void
     {
-        Notification::fake();
+        $this->request()
+            ->assertValid();
+    }
+
+    /**
+     * Тест на данные с ошибкой
+     * @test
+     */
+    public function it_should_fail_validation_on_password_confirm(): void
+    {
+        $this->request['password'] = '123';
+        $this->request['password_confirmation'] = '1234';
+
+        $this->request()
+            ->assertInvalid(['password']);
+    }
+
+    /** @test */
+    public function it_user_created_success(): void
+    {
+        $this->assertDatabaseMissing('users', [
+            'email' => $this->request['email']
+        ]);
+
+        $this->request();
+
+        $this->assertDatabaseHas('users', [
+            'email' => $this->request['email']
+        ]);
+    }
+
+
+    /** @test */
+    public function it_should_fail_validation_on_unique_email(): void
+    {
+        UserFactory::new()->create([
+            'email' => $this->request['email']
+        ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => $this->request['email']
+        ]);
+
+        $this->request()->assertInvalid(['email']);
+    }
+
+    /** @test */
+    public function it_registered_event_and_listeners_dispatched(): void
+    {
         Event::fake();
 
-        $request = SignUpFormRequest::factory()->create([
-            'email' => 'info@ya.ru',
-            'password' => '1234567890',
-            'password_confirmation' => '1234567890'
-        ]);
+        $this->request();
 
-        // Записи не существует
-        $this->assertDatabaseMissing('users', [
-            'email' => $request['email']
-        ]);
-
-        // Создание пользователя
-        $response = $this->post(action([SignUpController::class, 'handle']), $request);
-
-        // Валидация
-        $response->assertValid();
-
-        // Запись существует
-        $this->assertDatabaseHas('users', [
-            'email' => $request['email']
-        ]);
-
-        // Получить пользователя из базы
-        $user = User::query()
-            ->where('email', $request['email'])
-            ->first();
-
-        // Ивент зарегистрирован
         Event::assertDispatched(Registered::class);
-
-        // Слушатель зарегистрирован
-        Event::assertListening(Registered::class, SendEmailNewUserListener::class);
-
-        // Запускаем ивент руками т.к. нотисы вызываются на очередях
-        $event = new Registered($user);
-        $listener = new SendEmailNewUserListener();
-        $listener->handle($event);
-
-        // Оповещение отправлено пользователю
-        Notification::assertSentTo($user, NewUserNotification::class);
-
-        // Авторизован конкретный пользователь
-        $this->assertAuthenticatedAs($user);
-
-        // Осуществлен редирект на главную страницу
-        $response->assertRedirect(route('home'));
+        Event::assertListening(
+            Registered::class,
+            SendEmailNewUserListener::class
+        );
     }
+
+    /** @test */
+    public function it_notification_sent(): void
+    {
+        $this->request();
+
+        Notification::assertSentTo(
+            $this->findUser(),
+            NewUserNotification::class
+        );
+    }
+
+    /** @test */
+    public function it_user_authenticated_after_and_redirected(): void
+    {
+        $this->request()
+            ->assertRedirect(route('home'));
+
+        $this->assertAuthenticatedAs($this->findUser());
+    }
+
 }

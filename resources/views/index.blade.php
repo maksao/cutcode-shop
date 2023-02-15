@@ -66,40 +66,8 @@
         <!-- Section heading -->
         <h2 class="text-lg lg:text-[42px] font-black">Бренды</h2>
 
-        <!-- Brands list -->
         <div class="grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-6 gap-4 md:gap-8 mt-12">
             @each('catalog.shared.brand', $brands, 'item')
-            
-            <a href="catalog.html" class="p-6 rounded-xl bg-card hover:bg-card/60">
-                <div class="h-12 md:h-16">
-                    <img src="../../images/brands/2.png" class="object-contain w-full h-full" alt="Razer">
-                </div>
-                <div class="mt-8 text-xs sm:text-sm lg:text-md font-semibold text-center">Razer</div>
-            </a>
-            <a href="catalog.html" class="p-6 rounded-xl bg-card hover:bg-card/60">
-                <div class="h-12 md:h-16">
-                    <img src="../../images/brands/3.png" class="object-contain w-full h-full" alt="Logitech">
-                </div>
-                <div class="mt-8 text-xs sm:text-sm lg:text-md font-semibold text-center">Logitech</div>
-            </a>
-            <a href="catalog.html" class="p-6 rounded-xl bg-card hover:bg-card/60">
-                <div class="h-12 md:h-16">
-                    <img src="../../images/brands/4.png" class="object-contain w-full h-full" alt="HyperX">
-                </div>
-                <div class="mt-8 text-xs sm:text-sm lg:text-md font-semibold text-center">HyperX</div>
-            </a>
-            <a href="catalog.html" class="p-6 rounded-xl bg-card hover:bg-card/60">
-                <div class="h-12 md:h-16">
-                    <img src="../../images/brands/5.png" class="object-contain w-full h-full" alt="Playstation">
-                </div>
-                <div class="mt-8 text-xs sm:text-sm lg:text-md font-semibold text-center">Playstation</div>
-            </a>
-            <a href="catalog.html" class="p-6 rounded-xl bg-card hover:bg-card/60">
-                <div class="h-12 md:h-16">
-                    <img src="../../images/brands/6.png" class="object-contain w-full h-full" alt="XBOX">
-                </div>
-                <div class="mt-8 text-xs sm:text-sm lg:text-md font-semibold text-center">XBOX</div>
-            </a>
         </div>
     </section>
 @endsection
