@@ -10,6 +10,13 @@ if (!function_exists('filters')) {
     }
 }
 
+if (!function_exists('is_catalog_view')) {
+    function is_catalog_view(string $type, string $default = 'grid'): bool
+    {
+        return session('view', $default) === $type;
+    }
+}
+
 if (!function_exists('flash')) {
     function flash(): Flash
     {
