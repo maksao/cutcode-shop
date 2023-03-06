@@ -31,6 +31,7 @@ class DomainCommand extends Command
             File::makeDirectory(base_path("src/Domain/$this->domain/$dir"));
         }
 
+
         $this->registerServiceProvider();
 
         $this->registerRouteRegistrar();
@@ -49,16 +50,21 @@ class DomainCommand extends Command
 
         if (Str::contains(
             $domainProvider,
-            'Domain\\'.$this->domain.'\\Providers\\'.$this->domain.'ServiceProvider'
+            'Domain\\' . $this->domain . '\\Providers\\' . $this->domain . 'ServiceProvider'
         )) {
             return;
         }
+        $this->info($domainProviderPath);
 
-        file_put_contents($domainProviderPath, preg_replace(
-            '/public function register\(\): void\n+\s+\{\n+/m',
-            $this->registerMethodSignature() . $this->appRegister($this->domain),
-            $domainProvider
-        ));
+        file_put_contents(
+            $domainProviderPath,
+            preg_replace(
+//                '/public function register\(\): void\n+\s+\{\n+/m',
+                '/public function register\(\): void\s+\{/m',
+                $this->registerMethodSignature() . $this->appRegister($this->domain),
+                $domainProvider
+            )
+        );
     }
 
     protected function registerRouteRegistrar(): void
@@ -71,19 +77,23 @@ class DomainCommand extends Command
 
         if (Str::contains(
             $routeProvider,
-            'App\\Routing\\'.$this->domain.'Registrar'
+            'App\\Routing\\' . $this->domain . 'Registrar'
         )) {
             return;
         }
 
-        file_put_contents($routeProviderPath, preg_replace(
-            '/protected array \$registrars = \[\n\s+/m',
-            'protected array $registrars = ['.PHP_EOL
-            .$this->tab(2)
-            .'\App\Routing\\'.$this->domain.'Registrar::class,'.PHP_EOL
-            .$this->tab(2),
-            $routeProvider
-        ));
+        file_put_contents(
+            $routeProviderPath,
+            preg_replace(
+//                '/protected array \$registrars = \[\n\s+/m',
+                '/protected array \$registrars = \[\s+/m',
+                'protected array $registrars = [' . PHP_EOL
+                . $this->tab(2)
+                . '\App\Routing\\' . $this->domain . 'Registrar::class,' . PHP_EOL
+                . $this->tab(2),
+                $routeProvider
+            )
+        );
     }
 
     protected function makeRouteRegistrar(): void
@@ -112,14 +122,14 @@ class DomainCommand extends Command
 
     protected function registerMethodSignature(): string
     {
-        return 'public function register(): void'.PHP_EOL.'    {'.PHP_EOL;
+        return 'public function register(): void' . PHP_EOL . '    {' . PHP_EOL;
     }
 
     protected function appRegister(string $prefix): string
     {
-        return $this->tab(2).'$this->app->register('.PHP_EOL.
-            $this->tab(3)."\\Domain\\$prefix\\Providers\\{$prefix}ServiceProvider::class".PHP_EOL.
-            $this->tab(2).');'.PHP_EOL.PHP_EOL;
+        return $this->tab(2) . '$this->app->register(' . PHP_EOL .
+            $this->tab(3) . "\\Domain\\$prefix\\Providers\\{$prefix}ServiceProvider::class" . PHP_EOL .
+            $this->tab(2) . ');' . PHP_EOL . PHP_EOL;
     }
 
     protected function tab(int $tabCount = 1): string

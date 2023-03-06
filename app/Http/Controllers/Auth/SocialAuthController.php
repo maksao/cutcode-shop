@@ -7,6 +7,7 @@ use Domain\Auth\Models\User;
 use DomainException;
 use Illuminate\Http\RedirectResponse;
 use Laravel\Socialite\Facades\Socialite;
+use Support\SessionRegenerator;
 
 class SocialAuthController extends Controller
 {
@@ -31,12 +32,12 @@ class SocialAuthController extends Controller
         $user = User::query()->firstOrCreate([
             $driver . '_id' => $driverUser->getId(),
         ], [
-            'name' => $driverUser->getName() ?? 'NoName',
+            'name' => $driverUser->getName() ?? $driverUser->getEmail(),
             'email' => $driverUser->getEmail(),
             'password' => bcrypt(str()->random(20))
         ]);
 
-        auth()->login($user);
+        SessionRegenerator::run(fn() => auth()->login($user));
 
         return redirect()
             ->intended(route('home'));
