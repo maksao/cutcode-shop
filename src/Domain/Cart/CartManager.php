@@ -154,7 +154,7 @@ class CartManager
             return Cart::query()
                 ->with('cartItems')
                 ->where('storage_id', $this->identityStorage->get())
-                ->when(auth()->check(), fn(Builder $query) => $query->orWhere('user_id', auth()->id()))
+                ->when(auth()->check(), fn(Builder $query) => $query->where('user_id', auth()->id()))
                 ->first() ?? false;
             // Возвращаем false т.к. null кеш не запоминает
         });
