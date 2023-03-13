@@ -6,6 +6,10 @@ use InvalidArgumentException;
 use Stringable;
 use Support\Traits\Makeable;
 
+// для нормального преобразования числа в int
+// (int) bcmul(str("10,2")->replace(',','.')->value(), 100)
+//
+
 class Price implements Stringable
 {
     use Makeable;
