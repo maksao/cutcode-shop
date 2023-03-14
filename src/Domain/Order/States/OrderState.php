@@ -25,7 +25,7 @@ abstract class OrderState
 
     public function transitionTo(OrderState $state): void
     {
-        if ($this->canBeChanged()) {
+        if (!$this->canBeChanged()) {
             throw new InvalidArgumentException(
                 'Status can`t be changed'
             );
@@ -37,6 +37,8 @@ abstract class OrderState
             );
         }
 
+        $oldStatus = $this->order->status;
+
         $this->order->updateQuietly([
             'status' => $state->value()
         ]);
@@ -44,7 +46,7 @@ abstract class OrderState
         event(
             new OrderStatusChanged(
                 $this->order,
-                $this->order->status,
+                $oldStatus,
                 $state
             )
         );
